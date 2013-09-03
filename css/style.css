@@ -153,31 +153,11 @@ span.Topo { background-position: -15px -18px; }
 
 #map 
 {
-  background: #ccc;
-  -moz-border-radius-topleft: 16px;
-  -moz-border-radius-topright: 16px;
-  -webkit-border-top-left-radius: 16px;
-  -webkit-border-top-right-radius: 16px;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
   bottom: 0;
   left: 0;
   position: fixed;
   right: 0;
   top: 128px;
-}
-
-#infoBar
-{
-  background: #ccc;
-  bottom: 0;
-  color: #1C56A3;
-  font-size: 14px;
-  font-weight: bold;
-  left: 0;
-  padding: 16px;
-  position: absolute;
-  right: 0;
 }
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
