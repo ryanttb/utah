@@ -55,8 +55,6 @@ $(function () {
     return false;
   });
 
-  $("#pnlSearch input").watermark("street addres, city or zip");
-
   $.geo.proj = null;
   $("#map").geomap(options);
 
