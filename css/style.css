@@ -143,7 +143,7 @@ span.Topo { background-position: -15px -18px; }
 
 #pnlSearch input
 {
-  width: 192px;
+  width: 320px;
 }
 
 #pnlSearch button
@@ -158,6 +158,19 @@ span.Topo { background-position: -15px -18px; }
   position: fixed;
   right: 0;
   top: 128px;
+}
+
+#infoBar
+{
+  background: #ccc;
+  bottom: 0;
+  color: #1C56A3;
+  font-size: 14px;
+  font-weight: bold;
+  left: 0;
+  padding: 16px;
+  position: absolute;
+  right: 0;
 }
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
