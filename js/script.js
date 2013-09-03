@@ -30,26 +30,51 @@ $(function () {
   $("#pnlSearch form").submit(function (e) {
     e.preventDefault();
 
-    var address = $(this).find("input").val().replace(/,\s*UT/i, ""),
-        addressParts = address.split(",");
+    var searchText = $(this).find( "input" ).val( );
 
-    if (addressParts.length >= 2) {
-      address = address.replace(addressParts[addressParts.length - 1], "").replace(",", "");
-      $.ajax({
-        url: "http://mapserv.utah.gov/wsut/Geocode.svc/appgeo/street(" + $.trim(address) + ")zone(" + $.trim(addressParts[addressParts.length - 1]) + ")",
-        dataType: "jsonp",
-        success: function (result) {
-          $("#map").geomap("option", {
-            center: [result.UTM_X, result.UTM_Y],
-            zoom: 13
+    if ( searchText ) {
+      if ( searchText.indexOf( ',' ) < 0 ) {
+        // city only
+        $.ajax({
+          url: "http://mapserv.utah.gov/WSUT/FeatureGeometry.svc/GetEnvelope/find-generic-widget/layer(SGID10.BOUNDARIES.Municipalities)where(NAME)(=)(" + $.trim( searchText ) + ")quotes=true",
+          dataType: "jsonp",
+          success: function (result) {
+            if ( !result || result.Count === 0 ) {
+              displayMessage( "Sorry, we could not find a city with that name" );
+            } else {
+              var bbox = result.Results[ 0 ];
+              $("#map").geomap("option", {
+                bbox: [ bbox.MinX, bbox.MinY, bbox.MaxX, bbox.MaxY ]
+              });
+            }
+          },
+          error: function (xhr) {
+            displayMessage(xhr.statusText);
+          }
+        });
+      } else {
+        var address = $(this).find("input").val().replace(/,\s*UT/i, ""),
+            addressParts = address.split(",");
+
+        if (addressParts.length >= 2) {
+          address = address.replace(addressParts[addressParts.length - 1], "").replace(",", "");
+          $.ajax({
+            url: "http://mapserv.utah.gov/wsut/Geocode.svc/appgeo/street(" + $.trim(address) + ")zone(" + $.trim(addressParts[addressParts.length - 1]) + ")",
+            dataType: "jsonp",
+            success: function (result) {
+              $("#map").geomap("option", {
+                center: [result.UTM_X, result.UTM_Y],
+                zoom: 13
+              });
+            },
+            error: function (xhr) {
+              displayMessage(xhr.statusText);
+            }
           });
-        },
-        error: function (xhr) {
-          displayMessage(xhr.statusText);
+        } else {
+          displayMessage("Please enter both a street address and either a city or zip separated by a comma");
         }
-      });
-    } else {
-      displayMessage("Please enter both a street address and either a city or zip separated by a comma");
+      }
     }
 
     return false;
