@@ -17,7 +17,7 @@ $(function () {
     });
   });
 
-  var options = $.extend( { }, makeService("UtahBaseMap-Lite", 256), {
+  var options = $.extend( { }, makeService("Lite", 256), {
           center: [453709, 4333922],
           zoom: 2,
           move: function (e, geo) {
@@ -25,7 +25,7 @@ $(function () {
           }
         } );
 
-  $("input[value='UtahBaseMap-Lite']").prop("checked", true);
+  $("input[value='Lite']").prop("checked", true);
 
   $("#pnlSearch form").submit(function (e) {
     e.preventDefault();
@@ -92,7 +92,7 @@ $(function () {
       services: [
         {
           type: "tiled",
-          src: "http://mapserv.utah.gov/ArcGIS/rest/services/" + name + "/MapServer/tile/{{:zoom}}/{{:tile.row}}/{{:tile.column}}",
+          src: "http://mapserv.utah.gov/ArcGIS/rest/services/BaseMaps/" + name + "/MapServer/tile/{{:zoom}}/{{:tile.row}}/{{:tile.column}}",
           attr: "&copy; AGRC"
         }
       ],
