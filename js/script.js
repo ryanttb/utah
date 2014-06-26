@@ -3,6 +3,8 @@
 */
 
 $(function () {
+  var apiKey = '' //obtain from http://developer.mapserv.utah.gov/AccountAccess
+  
   $("#basemapButtons").buttonset().find("label").click(function () {
     var inputId = $(this).attr("for"),
         $basemapInput = $("#" + inputId),
@@ -17,7 +19,7 @@ $(function () {
     });
   });
 
-  var options = $.extend( { }, makeService("UtahBaseMap-Lite", 256), {
+  var options = $.extend( { }, makeService("Lite", 256), {
           center: [453709, 4333922],
           zoom: 2,
           move: function (e, geo) {
@@ -25,7 +27,7 @@ $(function () {
           }
         } );
 
-  $("input[value='UtahBaseMap-Lite']").prop("checked", true);
+  $("input[value='Lite']").prop("checked", true);
 
   $("#pnlSearch form").submit(function (e) {
     e.preventDefault();
@@ -36,15 +38,15 @@ $(function () {
       if ( searchText.indexOf( ',' ) < 0 ) {
         // city only
         $.ajax({
-          url: "http://mapserv.utah.gov/WSUT/FeatureGeometry.svc/GetEnvelope/find-generic-widget/layer(SGID10.BOUNDARIES.Municipalities)where(NAME)(=)(" + $.trim( searchText ) + ")quotes=true",
+          url: "http://api.mapserv.utah.gov/api/v1/search/SGID10.BOUNDARIES.Municipalities/shape@envelope?predicate=name+%3D+'" + $.trim( searchText ) + "'&apiKey=" + apiKey,
           dataType: "jsonp",
           success: function (result) {
-            if ( !result || result.Count === 0 ) {
+            if ( !result || result.result.lengh === 0) {
               displayMessage( "Sorry, we could not find a city with that name" );
             } else {
-              var bbox = result.Results[ 0 ];
+              var bbox = result.result[ 0 ].geometry.rings[0];
               $("#map").geomap("option", {
-                bbox: [ bbox.MinX, bbox.MinY, bbox.MaxX, bbox.MaxY ]
+                bbox: [ bbox[0], bbox[1], bbox[2], bbox[3] ]
               });
             }
           },
@@ -59,11 +61,11 @@ $(function () {
         if (addressParts.length >= 2) {
           address = address.replace(addressParts[addressParts.length - 1], "").replace(",", "");
           $.ajax({
-            url: "http://mapserv.utah.gov/wsut/Geocode.svc/appgeo/street(" + $.trim(address) + ")zone(" + $.trim(addressParts[addressParts.length - 1]) + ")",
+            url: "http://api.mapserv.utah.gov/api/v1/geocode/" + $.trim(address) + "/" + $.trim(addressParts[addressParts.length - 1]) + "?apiKey=" + apiKey
             dataType: "jsonp",
             success: function (result) {
               $("#map").geomap("option", {
-                center: [result.UTM_X, result.UTM_Y],
+                center: [result.location.x, result.location.y],
                 zoom: 13
               });
             },
@@ -92,7 +94,7 @@ $(function () {
       services: [
         {
           type: "tiled",
-          src: "http://mapserv.utah.gov/ArcGIS/rest/services/" + name + "/MapServer/tile/{{:zoom}}/{{:tile.row}}/{{:tile.column}}",
+          src: "http://mapserv.utah.gov/ArcGIS/rest/services/BaseMaps/" + name + "/MapServer/tile/{{:zoom}}/{{:tile.row}}/{{:tile.column}}",
           attr: "&copy; AGRC"
         }
       ],
