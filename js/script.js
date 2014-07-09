@@ -41,13 +41,19 @@ $(function () {
           url: "http://api.mapserv.utah.gov/api/v1/search/SGID10.BOUNDARIES.Municipalities/shape@envelope?predicate=name+%3D+'" + $.trim( searchText ) + "'&apiKey=" + apiKey,
           dataType: "jsonp",
           success: function (result) {
-            if ( !result || result.result.lengh === 0) {
-              displayMessage( "Sorry, we could not find a city with that name" );
+            if ( !result ) {
+              displayMessage( "Sorry, an unknown error has occurred, please try again" );
+            } else if ( result.status !== 200 || !result.result || !result.result.length ) {
+              displayMessage( result.message );
+            } else if ( !result.result[ 0 ].geometry.rings ) {
+              displayMessage( "We found a result but aren't sure where it is" );
             } else {
-              var bbox = result.result[ 0 ].geometry.rings[0];
-              $("#map").geomap("option", {
-                bbox: [ bbox[0], bbox[1], bbox[2], bbox[3] ]
-              });
+              var resultGeom = {
+                type: 'Polygon',
+                coordinates: result.result[ 0 ].geometry.rings
+              };
+              var bbox = $.geo.bbox( resultGeom );
+              $("#map").geomap( 'option', 'bbox', bbox );
             }
           },
           error: function (xhr) {
@@ -64,10 +70,18 @@ $(function () {
             url: "http://api.mapserv.utah.gov/api/v1/geocode/" + $.trim(address) + "/" + $.trim(addressParts[addressParts.length - 1]) + "?apiKey=" + apiKey,
             dataType: "jsonp",
             success: function (result) {
-              $("#map").geomap("option", {
-                center: [result.location.x, result.location.y],
-                zoom: 13
-              });
+              if ( !result ) {
+                displayMessage( "Sorry, an unknown error has occurred, please try again" );
+              } else if ( result.status !== 200 || !result.result ) {
+                displayMessage( result.message );
+              } else if ( !result.result.location.x ) {
+                displayMessage( "We found a result but aren't sure where it is" );
+              } else {
+                $("#map").geomap("option", {
+                  center: [ result.result.location.x, result.result.location.y],
+                  zoom: 12
+                });
+              }
             },
             error: function (xhr) {
               displayMessage(xhr.statusText);
