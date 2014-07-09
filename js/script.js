@@ -61,7 +61,7 @@ $(function () {
         if (addressParts.length >= 2) {
           address = address.replace(addressParts[addressParts.length - 1], "").replace(",", "");
           $.ajax({
-            url: "http://api.mapserv.utah.gov/api/v1/geocode/" + $.trim(address) + "/" + $.trim(addressParts[addressParts.length - 1]) + "?apiKey=" + apiKey
+            url: "http://api.mapserv.utah.gov/api/v1/geocode/" + $.trim(address) + "/" + $.trim(addressParts[addressParts.length - 1]) + "?apiKey=" + apiKey,
             dataType: "jsonp",
             success: function (result) {
               $("#map").geomap("option", {
